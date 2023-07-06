@@ -1,32 +1,20 @@
-<div id="<%= dom_id event %>">
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Name:</strong>
-    <%= event.name %>
+<%= tag.div id: dom_id(event), class: "bg-brand-lighter rounded-lg p-8" do %>
+
+  <p class="hover:text-gray">
+    <%= link_to event.organisation.kind.titleize, event %>
   </p>
 
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Description:</strong>
-    <%#= event.description %>
+  <p class="text-3xl font-bold mb-3 hover:text-gray">
+    <%= link_to event.name, event %>
   </p>
 
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Website:</strong>
-    <%= event.organisation.website %>
+  <p class="mb-6">
+    <%= pluralize(event.talks.count, "talk") %> from
+    <%= pluralize(event.talks.flat_map(&:speakers).uniq.count, "speakers") %>
   </p>
 
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Kind:</strong>
-    <%= event.organisation.kind %>
-  </p>
-
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Frequency:</strong>
-    <%= event.organisation.frequency %>
-  </p>
-
-  <% if action_name != "show" %>
-    <%= link_to "Show this event", event, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-    <%= link_to "Edit this event", edit_event_path(event), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
-    <hr class="mt-6">
+  <%= link_to event.organisation.website, class: "flex hover:text-black", target: "_top" do %>
+    <span class="mr-1">Website</span>
+    <%= heroicon "arrow-top-right-on-square" %>
   <% end %>
-</div>
+<% end %>

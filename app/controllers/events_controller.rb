@@ -1,14 +1,18 @@
 class EventsController < ApplicationController
+  include Pagy::Backend
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_event, only: %i[show edit update]
 
   # GET /events
   def index
-    @events = Event.all
+    @events = Event.all.order(date: :desc)
   end
 
   # GET /events/1
   def show
+    @from_talk_id = session[:from_talk_id]
+    session[:from_talk_id] = nil
+    @pagy, @talks = pagy(@event.talks.order(date: :desc).includes(:speakers, :event), items: 9)
   end
 
   # GET /events/1/edit

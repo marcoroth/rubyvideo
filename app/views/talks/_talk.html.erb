@@ -24,7 +24,7 @@
     <p><%= talk.description %></p>
 
     <p class="flex">
-      <span><%= talk.event_name %></span>
+      <span><%= link_to talk.event_name, talk.event, class: "hover:text-gray" %></span>
       <span><%#= talk.event_edition %></span>
     </p>
 
