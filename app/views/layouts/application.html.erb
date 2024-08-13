@@ -13,8 +13,9 @@
     <%= display_meta_tags site: "Ruby Video" %>
 
     <%= vite_client_tag %>
-    <%= vite_javascript_tag "application", media: "all", "data-turbo-track": "reload" %>
-    <%= vite_stylesheet_tag "application.css", media: "all", "data-turbo-track": "reload" %>
+    <%= vite_javascript_tag "application.js", media: 'all', "data-turbo-track": "reload" %>
+    <%= vite_stylesheet_tag "application.js", media: 'all', "data-turbo-track": "reload" %>
+
     <%= yield :head %>
   </head>
 

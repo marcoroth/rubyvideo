@@ -1,8 +1,10 @@
 // Example: Load Rails libraries in Vite.
 //
+import "./application.css"
 import '@hotwired/turbo-rails'
 
 import Turn from '@domchristie/turn'
+
 
 // import ActiveStorage from "@rails/activestorage";
 // ActiveStorage.start();
