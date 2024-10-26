@@ -21,3 +21,6 @@ application.register("video-player", VideoPlayerController)
 
 import PronounsSelectController from "./pronouns_select_controller"
 application.register("pronouns-select", PronounsSelectController)
+
+import BackgroundColorController from "./background_color_controller"
+application.register("background-color", BackgroundColorController)

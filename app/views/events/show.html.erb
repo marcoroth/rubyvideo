@@ -1,7 +1,11 @@
 <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
 
-<div class="w-full max-h-92 justify-center align-center flex" style="background: <%= @event.banner_background %>">
-  <%= image_tag image_path(@event.banner_image_path), class: "w-full max-h- aspect-auto container" %>
+<div class="w-full max-h-92 justify-center align-center flex" style="background-image: url(<%= image_path(@event.banner_image_path) %>); background-position: -1px -1px;  background-size: 2px 2px; background-repeat: repeat;">
+  <%= image_tag image_path(@event.banner_image_path), class: "w-full aspect-auto container" %>
+</div>
+
+<div class="w-full max-h-92 justify-center align-center flex" data-controller="background-color">
+  <%= image_tag image_path(@event.banner_image_path), class: "w-full aspect-auto container", data: { background_color_target: "image"} %>
 </div>
 
 <div class="container py-8">
