@@ -185,9 +185,9 @@ class Event < ApplicationRecord
   end
 
   def banner_background
-    static_metadata.banner_background.present? ? static_metadata.banner_background : "#FF607F"
+    static_metadata.banner_background.present? ? static_metadata.banner_background : "#DC153C"
   rescue => _e
-    "#FF607F"
+    "#DC153C"
   end
 
   def featurable?
