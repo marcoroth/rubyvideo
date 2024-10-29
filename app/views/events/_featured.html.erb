@@ -2,7 +2,7 @@
   <a href="<%= event_path(event) %>">
     <div class="lg:grid grid-cols-[1fr_2fr]">
       <div>
-        <div class="flex justify-center mb-9">
+        <div class="flex justify-center mb-9" data-atropos-offset="2">
           <%= image_tag event.featured_image_path, class: "max-h-24 lg:max-h-none", style: "view-transition-name: avatar", loading: "lazy" %>
         </div>
 
@@ -12,10 +12,10 @@
           <h2 class="text-inherit font-medium text-sm line-clamp-3 hidden lg:block"><%= event.description %></h2>
         </div>
 
-        <button class="btn rounded-full bg-white hover:bg-white/80 mt-6 mb-9 lg:mt-0 lg:mb-0">Explore All Talks</button>
+        <button class="btn rounded-full bg-white hover:bg-white/80 mt-6 mb-9 lg:mt-0 lg:mb-0" data-atropos-offset="2">Explore All Talks</button>
       </div>
 
-      <div class="hidden lg:flex flex-col justify-center items-center">
+      <div class="hidden lg:flex flex-col justify-center items-center" data-atropos-offset="1">
         <div>
           <div class="avatar-group -space-x-6 rtl:space-x-reverse">
             <% shown_speakers = [] %>
@@ -23,7 +23,7 @@
             <% all_speakers = event.speakers.to_a %>
             <% speakers_with_avatars = all_speakers.select { |speaker| speaker.github.present? } %>
 
-            <% event.keynote_speakers.each do |keynote_speaker| %>
+            <% event.keynote_speakers.each_with_index do |keynote_speaker, index| %>
               <% shown_speakers << keynote_speaker %>
 
               <div class="avatar bg-white">

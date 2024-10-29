@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AtroposController from "./atropos_controller"
+application.register("atropos", AtroposController)
+
 import AutoSubmitController from "./auto_submit_controller"
 application.register("auto-submit", AutoSubmitController)
 

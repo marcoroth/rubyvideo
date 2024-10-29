@@ -1,0 +1,12 @@
+<%= link_to event_path(event), class: "flex w-full h-42 aspect-video" do %>
+  <div class="atropos" data-controller="atropos">
+    <div class="atropos-scale">
+      <div class="atropos-rotate">
+        <div class="atropos-inner">
+          <%= image_tag image_path(event.featured_image_path), class: "p-12", loading: "lazy", data: {atropos_offset: -10}, style: "background-color: #{event.banner_background}" %>
+          <span class="text-xl text-center font-bold" data-atropos-offset="-5" style="color: <%= event.featured_color %>"><%= event.name %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
