@@ -1,7 +1,7 @@
 <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
 
-<div class="w-full max-h-92 justify-center align-center flex" style="view-transition-name: hero; background: <%= @event.banner_background %>">
-  <%= image_tag image_path(@event.banner_image_path), class: "w-full max-h- aspect-auto container" %>
+<div class="max-h-92 max-w-[1736px] min-[1736px]:border justify-center align-center flex min-[1736px]:my-6 min-[1736px]:px-24 mx-auto min-[1736px]:rounded-[20px]" style="view-transition-name: hero; background: <%= @event.banner_background %>">
+  <%= image_tag image_path(@event.banner_image_path), class: "w-full md:container md:max-h-92 h-92" %>
 </div>
 
 <div class="container py-8">
