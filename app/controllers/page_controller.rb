@@ -20,7 +20,7 @@ class PageController < ApplicationController
     @speakers_count = home_page_cached_data[:speakers_count]
     @latest_talks = Talk.includes(event: :organisation).where(id: home_page_cached_data[:latest_talk_ids])
     @latest_events = Event.includes(:organisation).where(id: home_page_cached_data[:latest_event_ids])
-    @featured_speakers = Speaker.where(id: home_page_cached_data[:featured_speaker_ids])
+    @featured_speakers = Speaker.where(id: home_page_cached_data[:featured_speaker_ids]).sample(10)
 
     # Add featured events logic
     playlist_slugs = Static::Playlist.where.not(featured_background: nil)
@@ -93,7 +93,7 @@ class PageController < ApplicationController
         end_date: event.end_date&.to_s,
         featured_background: event.featured_background,
         featured_color: event.featured_color,
-        url: root_url(path: "/events/#{event.slug}")
+        url: event_path(event.slug)
       }
     end
   end
