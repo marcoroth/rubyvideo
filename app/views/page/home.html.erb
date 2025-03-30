@@ -37,10 +37,18 @@
         <%= link_to "see all speakers", speakers_path, class: "link text-right w-full" %>
       </div>
       <div class="relative" data-controller="scroll">
-        <div class="overflow-x-auto scroll-smooth snap-x snap-mandatory" data-scroll-target="container">
+        <div class="overflow-x-auto scroll-smooth snap-x snap-mandatory" 
+             data-scroll-target="container"
+             data-action="scroll->scroll#checkScroll">
           <div class="flex pb-4 gap-8">
+            <% @featured_speakers.each do |speaker| %>
+              <div class="sm:hidden snap-start" data-scroll-target="card">
+                <%= render partial: "speakers/card", locals: { speaker: speaker } %>
+              </div>
+            <% end %>
+            
             <% @featured_speakers.each_slice(2) do |speaker_pair| %>
-              <div class="flex gap-8 snap-start">
+              <div class="hidden sm:flex gap-8 snap-start" data-scroll-target="card">
                 <% speaker_pair.each do |speaker| %>
                   <%= render partial: "speakers/card", locals: { speaker: speaker } %>
                 <% end %>
