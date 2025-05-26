@@ -778,3 +778,48 @@
         Get ready for an insightful and inspiring discussion full of real-world advice, and career journeys. Come with your questions—we'd love to see you there 👋
       video_provider: "scheduled"
       video_id: "staff-engineer-panel-wnb-rb-meetup-january-2025"
+
+- title: "WNB.rb Meetup March 2025"
+  raw_title: "WNB.rb Meetup March 2025"
+  event_name: "WNB.rb Meetup March 2025"
+  date: "2025-03-25"
+  video_id: "wnb-rb-meetup-march-2025"
+  video_provider: "children"
+  description: |-
+    https://www.wnb-rb.dev/meetups/2025/03/25
+  talks:
+    - title: "Deep Dive into All Things Networking"
+      raw_title: "Deep Dive into All Things Networking by Rachel Serwetz"
+      speakers:
+        - Rachel Serwetz
+      event_name: "WNB.rb Meetup March 2025"
+      date: "2025-03-25"
+      published_at: "2025-03-28"
+      description: |-
+        Are you nervous to network? Not sure how, when, or why we should network with other professionals, or how it can help you? In this talk, CEO & Career Coach Rachel Serwetz will deep dive into what networking really means and doesn't mean, how to make it comfortable and strategic for you, who to reach out to, what to do once you connect, how to follow up, and so much more. Bring all of your career questions for an AMA at the end!
+
+        About the speaker:
+        Rachel Serwetz' early professional experience was at Goldman Sachs in Operations and at Bridgewater Associates in HR. From there, she was trained as a coach at NYU and became a certified coach through the International Coach Federation. After this, she worked in HR Research at Aon Hewitt and attained her Technology MBA at NYU Stern. Throughout her career, she has helped hundreds of professionals with career exploration and for the past 7+ years she has been building her company, WOKEN, which is an online career exploration platform to coach professionals through the process of clarifying their ideal job and career path. She has also served as an Adjunct Professor of Entrepreneurship at Binghamton University and as a Career Coach through the Flatiron School/WeWork, Columbia University, and Project Activate. Learn more about WOKEN here: iamwoken.com.
+      video_provider: "youtube"
+      video_id: "salsNbWyx7c"
+
+- title: "WNB.rb Meetup April 2025"
+  raw_title: "WNB.rb Meetup April 2025"
+  event_name: "WNB.rb Meetup April 2025"
+  date: "2025-04-29"
+  video_id: "wnb-rb-meetup-april-2025"
+  video_provider: "children"
+  description: |-
+    https://www.wnb-rb.dev/meetups/2025/04/29
+  talks:
+    - title: "Objects and Test Boundaries: Finding Balance"
+      raw_title: "Objects and Test Boundaries: Finding Balance by Liz Pine"
+      speakers:
+        - Liz Pine
+      event_name: "WNB.rb Meetup April 2025"
+      date: "2025-04-29"
+      published_at: "2025-05-15"
+      description: |-
+        So you have a controller or a resolver that calls your domain objects, you feel confident in the test coverage, but over time the tests get slow. There are many well known and effective techniques for addressing slow tests, but what is at the core of this issue? That's what I want to explore in this talk, taking a step back and identifying where our boundaries lie.
+      video_provider: "youtube"
+      video_id: "vXLZ4yCd1ZE"
