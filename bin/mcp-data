@@ -1,0 +1,392 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Minimal MCP-compatible stdio server exposing data authoring tools.
+# It supports LSP-style framing with Content-Length headers.
+# Tools:
+# - data.add_org(json)
+# - data.add_playlist(organisation_slug, json)
+# - data.add_event(organisation_slug, json)
+# - data.update_event(organisation_slug, event_slug, json)
+# - data.add_video(organisation_slug, event_slug, json)
+# - data.update_video(organisation_slug, event_slug, selector, attributes)
+# - data.add_video_recording(organisation_slug, event_slug, selector, provider, video_id, published_at?)
+# - data.update_video_thumbnails(organisation_slug, event_slug, selector, thumbnails)
+# - data.update_video_slides(organisation_slug, event_slug, selector, slides_url)
+# - data.list_event_talks(organisation_slug, event_slug)
+# - data.list_speaker_talks(speaker_name)
+# - data.search_speakers(query)
+# - data.fetch_event_speakers(organisation_slug, event_slug)
+# - data.fetch_event_speakers_and_talks(organisation_slug, event_slug)
+
+require_relative "../config/environment"
+require "json"
+require "stringio"
+
+class MCPServer
+  def initialize
+    @next_id = 0
+  end
+
+  def run
+    loop do
+      req = read_message
+      break if req.nil?
+      handle(req)
+    end
+  rescue Errno::EPIPE, IOError
+    # client closed
+  end
+
+  private
+
+  def read_message
+    # Read LSP-style headers
+    headers = {}
+    line = nil
+    while (line = STDIN.gets)
+      line = line.chomp
+      break if line == ""
+      name, value = line.split(":", 2)
+      headers[name.strip.downcase] = value.strip if name && value
+    end
+
+    return nil if line.nil? && headers.empty?
+
+    if headers["content-length"]
+      length = headers["content-length"].to_i
+      body = STDIN.read(length)
+      JSON.parse(body)
+    else
+      # Fallback: plain line JSON (rare)
+      raw = STDIN.gets or return nil
+      JSON.parse(raw)
+    end
+  end
+
+  def write_message(payload)
+    json = JSON.generate(payload)
+    STDOUT.write("Content-Length: #{json.bytesize}\r\n\r\n")
+    STDOUT.write(json)
+    STDOUT.flush
+  end
+
+  def handle(req)
+    case req["method"]
+    when "initialize"
+      result = {
+        "protocolVersion" => "2024-11-05",
+        "capabilities" => {
+          "tools" => {
+            "listChanged" => false
+          }
+        }
+      }
+      write_message({"jsonrpc" => "2.0", "id" => req["id"], "result" => result})
+    when "tools/list"
+      tools = [
+        {
+          "name" => "data.add_org",
+          "description" => "Add or update an organisation in data/organisations.yml",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "name" => {"type" => "string"},
+              "slug" => {"type" => "string"},
+              "website" => {"type" => "string"},
+              "twitter" => {"type" => "string"},
+              "youtube_channel_name" => {"type" => "string"},
+              "kind" => {"type" => "string"},
+              "frequency" => {"type" => "string"},
+              "language" => {"type" => "string"},
+              "default_country_code" => {"type" => "string"}
+            },
+            "required" => ["name"]
+          }
+        },
+        {
+          "name" => "data.add_playlist",
+          "description" => "Add/update a playlist under data/{org}/playlists.yml",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "attributes" => {"type" => "object"}
+            },
+            "required" => ["organisation_slug", "attributes"]
+          }
+        },
+        {
+          "name" => "data.add_event",
+          "description" => "Add a new event (playlist entry) under data/{org}/playlists.yml",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "attributes" => {"type" => "object"}
+            },
+            "required" => ["organisation_slug", "attributes"]
+          }
+        },
+        {
+          "name" => "data.update_event",
+          "description" => "Update an existing event by slug",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"},
+              "attributes" => {"type" => "object"}
+            },
+            "required" => ["organisation_slug", "event_slug", "attributes"]
+          }
+        },
+        {
+          "name" => "data.add_video",
+          "description" => "Add/update a talk in data/{org}/{event}/videos.yml",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"},
+              "attributes" => {"type" => "object"}
+            },
+            "required" => ["organisation_slug", "event_slug", "attributes"]
+          }
+        },
+        {
+          "name" => "data.update_video",
+          "description" => "Update a talk in data/{org}/{event}/videos.yml by selector",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"},
+              "selector" => {"type" => "object"},
+              "attributes" => {"type" => "object"}
+            },
+            "required" => ["organisation_slug", "event_slug", "selector", "attributes"]
+          }
+        },
+        {
+          "name" => "data.add_video_recording",
+          "description" => "Add (YouTube) recording info to a talk",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"},
+              "selector" => {"type" => "object"},
+              "provider" => {"type" => "string"},
+              "video_id" => {"type" => "string"},
+              "published_at" => {"type" => "string"}
+            },
+            "required" => ["organisation_slug", "event_slug", "selector", "provider", "video_id"]
+          }
+        },
+        {
+          "name" => "data.update_video_thumbnails",
+          "description" => "Add thumbnails fields to talk (thumbnail_xs/sm/md/lg/xl)",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"},
+              "selector" => {"type" => "object"},
+              "thumbnails" => {"type" => "object"}
+            },
+            "required" => ["organisation_slug", "event_slug", "selector", "thumbnails"]
+          }
+        },
+        {
+          "name" => "data.update_video_slides",
+          "description" => "Add slides_url to a talk",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"},
+              "selector" => {"type" => "object"},
+              "slides_url" => {"type" => "string"}
+            },
+            "required" => ["organisation_slug", "event_slug", "selector", "slides_url"]
+          }
+        },
+        {
+          "name" => "data.add_speaker",
+          "description" => "Add or update a speaker in data/speakers.yml",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "name" => {"type" => "string"},
+              "twitter" => {"type" => "string"},
+              "github" => {"type" => "string"},
+              "website" => {"type" => "string"}
+            },
+            "required" => ["name"]
+          }
+        },
+        {
+          "name" => "data.list_event_talks",
+          "description" => "List talks of an event",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"}
+            },
+            "required" => ["organisation_slug", "event_slug"]
+          }
+        },
+        {
+          "name" => "data.list_speaker_talks",
+          "description" => "List all talks of a speaker",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "speaker_name" => {"type" => "string"}
+            },
+            "required" => ["speaker_name"]
+          }
+        },
+        {
+          "name" => "data.search_speakers",
+          "description" => "Search speakers by name substring",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "query" => {"type" => "string"}
+            },
+            "required" => ["query"]
+          }
+        },
+        {
+          "name" => "data.list_all_events",
+          "description" => "List all events (organisation_slug, title, slug, dates)",
+          "inputSchema" => {"type" => "object", "properties" => {}}
+        },
+        {
+          "name" => "data.fetch_event_speakers",
+          "description" => "Fetch speakers of event",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"}
+            },
+            "required" => ["organisation_slug", "event_slug"]
+          }
+        },
+        {
+          "name" => "data.fetch_event_speakers_and_talks",
+          "description" => "Fetch speakers and talks for event",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "organisation_slug" => {"type" => "string"},
+              "event_slug" => {"type" => "string"}
+            },
+            "required" => ["organisation_slug", "event_slug"]
+          }
+        },
+        {
+          "name" => "yt.video",
+          "description" => "Fetch YouTube video metadata by video ID (uses yt gem)",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {"video_id" => {"type" => "string"}},
+            "required" => ["video_id"]
+          }
+        },
+        {
+          "name" => "yt.playlist",
+          "description" => "Fetch YouTube playlist items by playlist ID (uses yt gem)",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {"playlist_id" => {"type" => "string"}},
+            "required" => ["playlist_id"]
+          }
+        }
+      ]
+      write_message({"jsonrpc" => "2.0", "id" => req["id"], "result" => {"tools" => tools}})
+    when "tools/call"
+      params = req["params"] || {}
+      name = params["name"]
+      args = params["arguments"] || {}
+      begin
+        result = case name
+        when "data.add_org"
+          DataTools.add_organisation!(args)
+        when "data.add_playlist"
+          DataTools.add_or_update_playlist!(organisation_slug: args.fetch("organisation_slug"), attributes: args.fetch("attributes"))
+        when "data.add_video"
+          DataTools.add_video!(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"), attributes: args.fetch("attributes"))
+        when "data.update_video"
+          DataTools.update_video!(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"), selector: args.fetch("selector"), attributes: args.fetch("attributes"))
+        when "data.add_video_recording"
+          DataTools.add_video_recording!(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"), selector: args.fetch("selector"), provider: args.fetch("provider"), video_id: args.fetch("video_id"), published_at: args["published_at"])
+        when "data.update_video_thumbnails"
+          DataTools.update_video_thumbnails!(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"), selector: args.fetch("selector"), thumbnails: args.fetch("thumbnails"))
+        when "data.update_video_slides"
+          DataTools.update_video_slides!(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"), selector: args.fetch("selector"), slides_url: args.fetch("slides_url"))
+        when "data.add_event"
+          DataTools.add_event!(organisation_slug: args.fetch("organisation_slug"), attributes: args.fetch("attributes"))
+        when "data.update_event"
+          DataTools.update_event!(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"), attributes: args.fetch("attributes"))
+        when "data.add_speaker"
+          DataTools.add_speaker!(args)
+        when "data.list_event_talks"
+          DataTools.list_event_talks(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"))
+        when "data.list_speaker_talks"
+          DataTools.list_speaker_talks(speaker_name: args.fetch("speaker_name"))
+        when "data.search_speakers"
+          DataTools.search_speakers(query: args.fetch("query"))
+        when "data.list_all_events"
+          DataTools.list_all_events
+        when "data.fetch_event_speakers"
+          DataTools.fetch_event_speakers(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"))
+        when "data.fetch_event_speakers_and_talks"
+          DataTools.fetch_event_speakers_and_talks(organisation_slug: args.fetch("organisation_slug"), event_slug: args.fetch("event_slug"))
+        when "yt.video"
+          require "yt"
+          v = Yt::Video.new id: args.fetch("video_id")
+          {
+            id: v.id,
+            title: v.title,
+            description: v.description,
+            duration: v.duration,
+            published_at: v.published_at&.to_s,
+            channel_id: v.channel_id,
+            thumbnails: v.thumbnail_url
+          }
+        when "yt.playlist"
+          require "yt"
+          p = Yt::Playlist.new id: args.fetch("playlist_id")
+          p.playlist_items.map do |item|
+            v = item.video
+            {
+              id: v.id,
+              title: v.title,
+              description: v.description,
+              published_at: v.published_at&.to_s,
+              channel_id: v.channel_id,
+              thumbnail_xs: v.thumbnail_url,
+              video_provider: "youtube",
+              video_id: v.id
+            }
+          end
+        else
+          raise "Unknown tool: #{name}"
+        end
+        write_message({"jsonrpc" => "2.0", "id" => req["id"], "result" => {"content" => [{"type" => "text", "text" => JSON.generate(result)}]}})
+      rescue => e
+        write_message({"jsonrpc" => "2.0", "id" => req["id"], "error" => {"code" => -32000, "message" => e.message}})
+      end
+    else
+      # generic reply to unknown methods
+      write_message({"jsonrpc" => "2.0", "id" => req["id"], "error" => {"code" => -32601, "message" => "Method not found"}})
+    end
+  end
+end
+
+MCPServer.new.run
