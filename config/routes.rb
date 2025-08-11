@@ -6,6 +6,10 @@ Rails.application.routes.draw do
     resources :missing, only: [:index]
   end
 
+  namespace :events do
+    resources :missing, only: [:index]
+  end
+
   resources :sponsors, param: :slug, only: [:index, :show] do
     resource :logos, only: [:show, :update], controller: "sponsors/logos"
   end

@@ -25,6 +25,9 @@ application.register("event", EventController)
 import EventListController from "./event_list_controller"
 application.register("event-list", EventListController)
 
+import EventsFilterController from "./events_filter_controller"
+application.register("events-filter", EventsFilterController)
+
 import LazyLoadingController from "./lazy_loading_controller"
 application.register("lazy-loading", LazyLoadingController)
 
