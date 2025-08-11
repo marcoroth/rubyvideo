@@ -1,3 +1,12 @@
+<% if Rails.env.development? %>
+  <div class="mb-4">
+    <%= ui_button url: speaker_passport_path(speaker), kind: :neutral, size: :sm, target: "_blank" do %>
+      <%= fa "passport", size: :xs %>
+      <span>Ruby Passport</span>
+    <% end %>
+  </div>
+<% end %>
+
 <% if speaker.github.blank? %>
   <%= link_to edit_speaker_path(speaker), class: "link link-accent link-ghost", data: {turbo_frame: "modal"} do %>
     Help us improve the speaker profile by adding a GitHub handle

@@ -1,0 +1,387 @@
+<!-- Cover Page -->
+<div class="passport-page passport-cover bg-red-600 text-white">
+  <div class="mb-4">
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Abstract ruby gem shape -->
+      <path d="M40 10 L60 25 L60 45 L40 70 L20 45 L20 25 Z" fill="white" opacity="0.9"/>
+      <path d="M40 10 L60 25 L40 35 Z" fill="white"/>
+      <path d="M60 25 L60 45 L40 35 Z" fill="white" opacity="0.85"/>
+      <path d="M60 45 L40 70 L40 35 Z" fill="white" opacity="0.75"/>
+      <path d="M40 70 L20 45 L40 35 Z" fill="white" opacity="0.8"/>
+      <path d="M20 45 L20 25 L40 35 Z" fill="white" opacity="0.85"/>
+      <path d="M20 25 L40 10 L40 35 Z" fill="white" opacity="0.95"/>
+    </svg>
+  </div>
+  <h1 class="text-4xl font-bold mb-2">Ruby Passport</h1>
+  <p class="text-lg text-red-100 mb-8">International Ruby Community</p>
+  
+  <div class="mt-auto">
+    <p class="text-sm text-red-200">Passport Number</p>
+    <p class="font-mono font-bold">RBP-<%= @speaker.id.to_s.rjust(6, '0') %></p>
+  </div>
+</div>
+
+<!-- Personal Information Page -->
+<div class="passport-page">
+  <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-red-600 pb-2">Personal Information</h2>
+  
+  <div class="flex gap-6 mb-6">
+    <div class="passport-photo">
+      <% if @speaker.custom_avatar? %>
+        <%= image_tag @speaker.avatar_url(size: 120), class: "w-full h-full object-cover", alt: @speaker.name %>
+      <% else %>
+        <span class="text-gray-400">Photo</span>
+      <% end %>
+    </div>
+    
+    <div class="flex-1">
+      <div class="mb-3">
+        <p class="text-xs text-gray-600 uppercase">Name</p>
+        <p class="font-bold text-lg"><%= @speaker.name %></p>
+      </div>
+      
+      <% if @speaker.github.present? %>
+        <div class="mb-3">
+          <p class="text-xs text-gray-600 uppercase">GitHub</p>
+          <p class="font-mono">@<%= @speaker.github %></p>
+        </div>
+      <% end %>
+      
+      <div class="mb-3">
+        <p class="text-xs text-gray-600 uppercase">Ruby Since</p>
+        <p class="font-bold"><%= @first_talk_year %></p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="border-t pt-4">
+    <div class="mb-4">
+      <p class="text-xs text-gray-600 uppercase mb-1">Home Base</p>
+      <div class="border-b border-gray-300 pb-1">
+        <%= @events_attended.first&.city || "____________________" %>
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <p class="text-xs text-gray-600 uppercase mb-1">Ruby Motto</p>
+      <div class="border-b border-gray-300 pb-1">____________________</div>
+    </div>
+    
+    <div>
+      <p class="text-xs text-gray-600 uppercase mb-1">Signature</p>
+      <div class="border-b border-gray-300 pb-1 h-12"></div>
+    </div>
+  </div>
+  
+  <div class="mt-auto pt-4 text-center text-xs text-gray-500">
+    Issued: <%= Date.current.strftime("%B %Y") %>
+  </div>
+</div>
+
+<!-- Ruby Philosophy Page -->
+<div class="passport-page">
+  <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-red-600 pb-2">Ruby Philosophy</h2>
+  
+  <div class="mb-6">
+    <p class="text-sm font-semibold mb-3">My Favorite Ruby Principles:</p>
+    <div class="space-y-2">
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox checkbox-sm" />
+        <span>MINASWAN (Matz is nice and so we are nice)</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox checkbox-sm" />
+        <span>Convention over Configuration</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox checkbox-sm" />
+        <span>DRY (Don't Repeat Yourself)</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox checkbox-sm" />
+        <span>Optimize for Developer Happiness</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox checkbox-sm" />
+        <span>Principle of Least Surprise</span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="mb-6">
+    <p class="text-sm font-semibold mb-2">Why I Love Ruby:</p>
+    <div class="border border-gray-300 rounded p-3 min-h-[100px]"></div>
+  </div>
+  
+  <div>
+    <p class="text-sm font-semibold mb-2">My Favorite Ruby Method/Gem:</p>
+    <div class="border-b border-gray-300 pb-1"></div>
+  </div>
+  
+  <div class="mt-auto pt-6 text-center">
+    <p class="text-xs text-gray-500 italic">"Matz is nice and so we are nice"</p>
+  </div>
+</div>
+
+<!-- Statistics Page -->
+<div class="passport-page">
+  <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-red-600 pb-2">Ruby Journey</h2>
+  
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="text-center p-4 bg-red-50 rounded">
+      <p class="text-3xl font-bold text-red-600"><%= @total_talks %></p>
+      <p class="text-sm text-gray-600">Talks Given</p>
+    </div>
+    <div class="text-center p-4 bg-red-50 rounded">
+      <p class="text-3xl font-bold text-red-600"><%= @total_events %></p>
+      <p class="text-sm text-gray-600">Events Attended</p>
+    </div>
+    <div class="text-center p-4 bg-red-50 rounded">
+      <p class="text-3xl font-bold text-red-600"><%= @countries_visited.length %></p>
+      <p class="text-sm text-gray-600">Countries</p>
+    </div>
+    <div class="text-center p-4 bg-red-50 rounded">
+      <p class="text-3xl font-bold text-red-600"><%= @years_active %></p>
+      <p class="text-sm text-gray-600">Years Active</p>
+    </div>
+  </div>
+  
+  <div class="mb-4">
+    <p class="text-sm font-semibold mb-2">Countries Visited:</p>
+    <div class="flex flex-wrap gap-2">
+      <% @countries_visited.first(10).each do |country| %>
+        <span class="px-2 py-1 bg-gray-100 rounded text-xs"><%= country.translations["en"] %></span>
+      <% end %>
+      <% if @countries_visited.length > 10 %>
+        <span class="px-2 py-1 bg-gray-100 rounded text-xs">+<%= @countries_visited.length - 10 %> more</span>
+      <% end %>
+    </div>
+  </div>
+  
+  <div>
+    <p class="text-sm font-semibold mb-2">Recent Talks:</p>
+    <div class="space-y-1">
+      <% @talks_given.limit(5).each do |talk| %>
+        <div class="text-xs">
+          <span class="font-medium"><%= talk.title.truncate(40) %></span>
+          <span class="text-gray-500">(<%= talk.event.name %>)</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Event Stamps Page 1 -->
+<div class="passport-page">
+  <h2 class="text-xl font-bold mb-4 text-center border-b-2 border-red-600 pb-2">Event Stamps</h2>
+  <p class="text-xs text-center text-gray-500 mb-4">Events attended with stickers</p>
+  
+  <div class="stamp-grid">
+    <% @events_with_stickers.first(6).each do |event| %>
+      <div class="stamp-box p-2 flex flex-col items-center justify-center">
+        <% if event.sticker? %>
+          <%= image_tag event.sticker_image_path, class: "w-16 h-16 object-contain", alt: event.name %>
+          <span class="text-xs mt-1 text-center text-gray-600"><%= event.start_date&.year %></span>
+        <% end %>
+      </div>
+    <% end %>
+    <% (6 - @events_with_stickers.first(6).count).times do %>
+      <div class="stamp-box">
+        <span class="text-xs">Event Stamp</span>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Event Stamps Page 2 -->
+<div class="passport-page">
+  <h2 class="text-xl font-bold mb-4 text-center border-b-2 border-red-600 pb-2">Event Stamps</h2>
+  
+  <div class="stamp-grid">
+    <% @events_with_stickers.slice(6, 6).each do |event| %>
+      <div class="stamp-box p-2 flex flex-col items-center justify-center">
+        <% if event.sticker? %>
+          <%= image_tag event.sticker_image_path, class: "w-16 h-16 object-contain", alt: event.name %>
+          <span class="text-xs mt-1 text-center text-gray-600"><%= event.start_date&.year %></span>
+        <% end %>
+      </div>
+    <% end %>
+    <% stamps_shown = @events_with_stickers.slice(6, 6)&.count || 0 %>
+    <% (6 - stamps_shown).times do %>
+      <div class="stamp-box">
+        <span class="text-xs">Event Stamp</span>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Ruby Bucket List -->
+<div class="passport-page">
+  <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-red-600 pb-2">Ruby Bucket List</h2>
+  
+  <div class="space-y-3">
+    <h3 class="font-semibold text-sm mb-2">Major Conferences:</h3>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>RubyConf (USA)</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>RailsConf</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>RubyKaigi (Japan)</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>EuRuKo (Europe)</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>RubyConf AU (Australia)</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>Brighton Ruby (UK)</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>RubyConf Taiwan</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>Rocky Mountain Ruby</span>
+    </label>
+    
+    <h3 class="font-semibold text-sm mt-4 mb-2">Goals:</h3>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>Give a conference talk</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>Contribute to Ruby/Rails core</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>Publish a Ruby gem</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox checkbox-sm" />
+      <span>Meet Matz</span>
+    </label>
+  </div>
+</div>
+
+<!-- Connections Page -->
+<div class="passport-page">
+  <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-red-600 pb-2">Ruby Connections</h2>
+  <p class="text-xs text-center text-gray-500 mb-4">Rubyists I've met at events</p>
+  
+  <div class="space-y-3">
+    <div>
+      <div class="flex gap-4 text-xs text-gray-600 mb-1">
+        <span class="w-1/3">Name</span>
+        <span class="w-1/3">Event</span>
+        <span class="w-1/3">Date</span>
+      </div>
+      <div class="connection-line"></div>
+    </div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+    <div class="connection-line"></div>
+  </div>
+</div>
+
+<!-- Signatures Page -->
+<div class="passport-page">
+  <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-red-600 pb-2">Signatures</h2>
+  <p class="text-xs text-center text-gray-500 mb-6">Collect signatures from Ruby heroes & community members</p>
+  
+  <div class="grid grid-cols-2 gap-4">
+    <div class="border border-gray-300 rounded p-2 h-24">
+      <p class="text-xs text-gray-400">Signature</p>
+    </div>
+    <div class="border border-gray-300 rounded p-2 h-24">
+      <p class="text-xs text-gray-400">Signature</p>
+    </div>
+    <div class="border border-gray-300 rounded p-2 h-24">
+      <p class="text-xs text-gray-400">Signature</p>
+    </div>
+    <div class="border border-gray-300 rounded p-2 h-24">
+      <p class="text-xs text-gray-400">Signature</p>
+    </div>
+    <div class="border border-gray-300 rounded p-2 h-24">
+      <p class="text-xs text-gray-400">Signature</p>
+    </div>
+    <div class="border border-gray-300 rounded p-2 h-24">
+      <p class="text-xs text-gray-400">Signature</p>
+    </div>
+  </div>
+  
+  <div class="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
+    <p class="text-xs text-center">✨ Special Achievement: Matz's Signature ✨</p>
+    <div class="mt-2 border-b-2 border-gray-400"></div>
+  </div>
+</div>
+
+<!-- Back Cover -->
+<div class="passport-page">
+  <h2 class="text-xl font-bold mb-4 text-center">Emergency Contact</h2>
+  
+  <div class="mb-6">
+    <p class="text-sm mb-2">If found at a conference, please return to:</p>
+    <div class="space-y-2">
+      <div class="border-b border-gray-300 pb-1"></div>
+      <div class="border-b border-gray-300 pb-1"></div>
+    </div>
+  </div>
+  
+  <div class="mb-6">
+    <p class="text-sm mb-2">Social Handles:</p>
+    <div class="space-y-2">
+      <% if @speaker.github.present? %>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">GitHub:</span>
+          <span class="font-mono text-sm">@<%= @speaker.github %></span>
+        </div>
+      <% end %>
+      <% if @speaker.twitter.present? %>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">X/Twitter:</span>
+          <span class="font-mono text-sm">@<%= @speaker.twitter %></span>
+        </div>
+      <% end %>
+      <% if @speaker.bsky.present? %>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">Bluesky:</span>
+          <span class="font-mono text-sm">@<%= @speaker.bsky %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="mt-auto pt-6 text-center">
+    <div class="mb-4">
+      <div class="text-4xl mb-2">💎</div>
+      <p class="font-bold">RubyEvents.org</p>
+      <p class="text-xs text-gray-500">Connecting the Ruby Community Worldwide</p>
+    </div>
+    
+    <div class="mt-4 pt-4 border-t">
+      <p class="text-xs text-gray-500">
+        This passport belongs to a member of the<br>
+        International Ruby Community
+      </p>
+    </div>
+  </div>
+</div>

@@ -77,7 +77,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :speakers, param: :slug, only: [:index, :show, :update, :edit]
+  resources :speakers, param: :slug, only: [:index, :show, :update, :edit] do
+    resource :passport, only: [:show], controller: "speakers/passports"
+  end
   resources :events, param: :slug, only: [:index, :show, :update, :edit] do
     scope module: :events do
       collection do
