@@ -35,5 +35,12 @@
         <%= fab("speaker-deck", size: :md) %>
       <% end %>
     <% end %>
+    
+    <% if Rails.env.development? || (defined?(user_kind) && (user_kind == :owner || user_kind == :admin)) %>
+      <div class="divider divider-horizontal mx-1"></div>
+      <%= ui_button url: speaker_passport_path(speaker), kind: :circle, size: :sm, target: "_blank", class: "hover:bg-red-600 hover:fill-white border-base-200", data: {tip: "Ruby Passport"} do %>
+        <%= fa("passport", type: "full", size: :md) %>
+      <% end %>
+    <% end %>
   </div>
 </div>

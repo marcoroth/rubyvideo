@@ -1,12 +1,5 @@
 
-<div class="flex gap-2">
-  <%= ui_button url: edit_speaker_path(speaker), kind: :neutral, size: :sm, data: {turbo_frame: "modal"} do %>
-    <%= fa :pen, size: :xs %>
-    <span>Update my profile</span>
-  <% end %>
-
-  <%= ui_button url: speaker_passport_path(speaker), kind: :neutral, size: :sm, target: "_blank" do %>
-    <%= fa "passport", size: :xs %>
-    <span>Ruby Passport</span>
-  <% end %>
-</div>
+<%= ui_button url: edit_speaker_path(speaker), kind: :neutral, size: :sm, data: {turbo_frame: "modal"} do %>
+  <%= fa :pen, size: :xs %>
+  <span>Update my profile</span>
+<% end %>
