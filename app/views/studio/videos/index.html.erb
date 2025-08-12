@@ -1,0 +1,80 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold">Videos for <%= @event["title"] || @event["name"] %></h1>
+      <% org = Studio::YAMLService.read_organizations.find { |o| o["slug"] == @organization_slug } %>
+      <p class="text-gray-600"><%= org&.dig("name") || @organization_slug %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "Add Video", new_studio_event_video_path(event_id: @event_slug), class: "btn btn-primary" %>
+      <%= link_to "Back to Event", studio_event_path(id: @event_slug, organization_id: @organization_slug), class: "btn btn-outline" %>
+    </div>
+  </div>
+
+  <% if @videos.any? %>
+    <div class="space-y-4">
+      <% @videos.each_with_index do |video, index| %>
+        <div class="card bg-base-100 border">
+          <div class="card-body">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h2 class="card-title"><%= video["title"] %></h2>
+                <% if video["speakers"].present? %>
+                  <p class="text-gray-600">
+                    Speakers: <%= Array(video["speakers"]).join(", ") %>
+                  </p>
+                <% end %>
+                <% if video["description"].present? %>
+                  <p class="text-sm mt-2"><%= truncate(video["description"], length: 200) %></p>
+                <% end %>
+                <div class="flex gap-2 mt-2">
+                  <span class="badge"><%= video["video_provider"] || "unknown" %></span>
+                  <% if video["date"] %>
+                    <span class="badge badge-outline"><%= video["date"] %></span>
+                  <% end %>
+                  <% if video["language"] %>
+                    <span class="badge badge-outline"><%= video["language"] %></span>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="flex gap-2 ml-4">
+                <% if video["video_provider"] == "youtube" && video["video_id"] %>
+                  <a href="https://youtube.com/watch?v=<%= video["video_id"] %>" target="_blank" class="btn btn-sm btn-outline">
+                    Preview
+                  </a>
+                <% end %>
+                <%= link_to "Edit", edit_studio_event_video_path(event_id: @event_slug, id: index), class: "btn btn-sm" %>
+                <%= link_to "Delete", studio_event_video_path(event_id: @event_slug, id: index), method: :delete,
+                      data: {confirm: "Are you sure?"}, class: "btn btn-sm btn-error" %>
+              </div>
+            </div>
+
+            <% if video["video_provider"] == "youtube" && video["video_id"] %>
+              <div class="mt-4" data-controller="video-preview">
+                <button data-action="click->video-preview#toggle" class="btn btn-sm btn-ghost">
+                  Show/Hide Preview
+                </button>
+                <div data-video-preview-target="container" class="hidden mt-4">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/<%= video["video_id"] %>"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                      class="w-full h-96">
+                    </iframe>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      <p>No videos yet. Add videos manually or fetch them from a YouTube playlist.</p>
+    </div>
+  <% end %>
+</div>

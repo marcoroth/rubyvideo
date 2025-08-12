@@ -1,0 +1,83 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Download Event Sponsors</h1>
+
+  <div class="alert alert-info mb-8">
+    <p>Select an event and provide either the sponsors page URL or the main event website to automatically extract sponsor information.</p>
+  </div>
+
+  <div class="mb-6">
+    <div class="flex gap-2">
+      <%= link_to "All Events", studio_sponsors_path(filter: "all"), 
+            class: "btn #{'btn-primary' if @filter == 'all'} #{'btn-outline' if @filter != 'all'}" %>
+      <%= link_to "Events with Sponsors", studio_sponsors_path(filter: "with_sponsors"), 
+            class: "btn #{'btn-primary' if @filter == 'with_sponsors'} #{'btn-outline' if @filter != 'with_sponsors'}" %>
+      <%= link_to "Events without Sponsors", studio_sponsors_path(filter: "without_sponsors"), 
+            class: "btn #{'btn-primary' if @filter == 'without_sponsors'} #{'btn-outline' if @filter != 'without_sponsors'}" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:h-[calc(100vh-12rem)]" data-controller="sponsor-preview">
+    <div class="lg:overflow-y-auto lg:pr-4">
+      <h2 class="text-xl font-bold mb-4 lg:sticky lg:top-0 lg:bg-base-100 lg:pb-2 lg:z-10">Recent Events</h2>
+      <div class="space-y-4">
+        <% @events.each do |event| %>
+          <div class="card bg-base-100 border">
+            <div class="card-body">
+              <h3 class="font-semibold"><%= event.name %></h3>
+              <p class="text-sm text-gray-600">
+                <%= event.organisation.name %> • <%= event.date&.strftime("%B %Y") %>
+              </p>
+
+              <% sponsors_exist = File.exist?(Studio::YAMLService::DATA_PATH.join(event.organisation.slug, event.slug, "sponsors.yml")) %>
+
+              <% if sponsors_exist %>
+                <div class="badge badge-success">Sponsors already downloaded</div>
+              <% end %>
+
+              <%= form_with url: studio_sponsors_path, local: true, class: "mt-4 space-y-3" do |f| %>
+                <%= f.hidden_field :event_id, value: event.id %>
+
+                <div class="form-control">
+                  <%= f.label :sponsor_url, "Direct Sponsors Page URL", class: "label" %>
+                  <%= f.text_field :sponsor_url, class: "input input-bordered input-sm w-full",
+                        placeholder: "https://rubyconf.com/sponsors" %>
+                </div>
+
+                <div class="divider">OR</div>
+
+                <div class="form-control">
+                  <%= f.label :base_url, "Event Website (will auto-find sponsors)", class: "label" %>
+                  <%= f.text_field :base_url, value: event.website, class: "input input-bordered input-sm w-full",
+                        placeholder: "https://rubyconf.com" %>
+                  <label class="label">
+                    <span class="label-text-alt text-warning">⚠️ Make sure this is the archived website URL for when this event happened, not the current year's website</span>
+                  </label>
+                </div>
+
+                <div class="flex gap-2">
+                  <%= f.submit "Download Sponsors", class: "btn btn-primary btn-sm" %>
+                  <button type="button"
+                          class="btn btn-outline btn-sm"
+                          data-action="click->sponsor-preview#fetch"
+                          data-event-id="<%= event.id %>"
+                          data-event-name="<%= event.name %>">
+                    Preview
+                  </button>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="lg:sticky lg:top-0 lg:h-full">
+      <h2 class="text-xl font-bold mb-4">Preview</h2>
+      <div id="sponsor-preview" class="card bg-base-100 border lg:h-[calc(100%-4rem)] lg:overflow-y-auto">
+        <div class="card-body">
+          <p class="text-gray-500">Select an event and click Preview to see sponsors before downloading.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

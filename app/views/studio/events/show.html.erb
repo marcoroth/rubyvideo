@@ -1,0 +1,176 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-3xl font-bold mb-2"><%= @event["title"] || @event["name"] %></h1>
+        <p class="text-gray-600">
+          <% org = Studio::YAMLService.read_organizations.find { |o| o["slug"] == @organization_slug } %>
+          <%= org&.dig("name") || @organization_slug %> •
+          <% if @event["date"] || @event["published_at"] %>
+            <%= Date.parse((@event["date"] || @event["published_at"]).to_s).strftime("%B %d, %Y") %>
+            <% if @event["end_date"] && @event["end_date"] != (@event["date"] || @event["published_at"]) %>
+              - <%= Date.parse(@event["end_date"].to_s).strftime("%B %d, %Y") %>
+            <% end %>
+          <% end %>
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <%= link_to "Edit Event", edit_studio_event_path(id: @event_slug, organization_id: @organization_slug), class: "btn" %>
+        <%= link_to "Back to Events", studio_events_path, class: "btn btn-outline" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <div class="card bg-base-100 border mb-6">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Videos (<%= @videos.count %>)</h2>
+
+          <% playlist_id = if @playlist.is_a?(Hash)
+               @playlist["playlist_id"]
+             else
+               @playlist&.try(:playlist_id) || @playlist&.attributes&.dig("playlist_id")
+             end %>
+          <% if playlist_id %>
+            <div class="mb-4">
+              <p class="text-sm text-gray-600 mb-2">YouTube Playlist ID: <code><%= playlist_id %></code></p>
+              <%= form_with url: fetch_videos_studio_event_path(id: @event_slug, organization_id: @organization_slug), method: :post, class: "flex gap-2" do |f| %>
+                <%= f.hidden_field :playlist_id, value: playlist_id %>
+                <%= f.submit "Fetch Videos from YouTube", class: "btn btn-primary btn-sm" %>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="alert alert-info mb-4">
+              <p>No YouTube playlist configured. Add a playlist ID in the event settings to fetch videos.</p>
+            </div>
+          <% end %>
+
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold">Current Videos</h3>
+            <%= link_to "Manage Videos", studio_event_videos_path(event_id: @event_slug), class: "btn btn-sm btn-primary" %>
+          </div>
+
+          <% if @videos.any? %>
+            <div class="space-y-2">
+              <% @videos.first(5).each do |video| %>
+                <div class="border rounded p-3">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="font-semibold"><%= video["title"] %></h4>
+                      <p class="text-sm text-gray-600">
+                        <% if video["speakers"].is_a?(Array) %>
+                          <%= video["speakers"].join(", ") %>
+                        <% elsif video["speakers"].present? %>
+                          <%= video["speakers"] %>
+                        <% end %>
+                      </p>
+                    </div>
+                    <% if video["video_provider"] == "youtube" %>
+                      <a href="https://youtube.com/watch?v=<%= video["video_id"] %>" target="_blank" class="btn btn-xs">
+                        Watch
+                      </a>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+              <% if @videos.count > 5 %>
+                <p class="text-sm text-gray-600 text-center">
+                  ... and <%= @videos.count - 5 %> more videos
+                </p>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-500">No videos added yet.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Sponsors</h2>
+
+          <% if @sponsors.any? %>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <% @sponsors.first.dig("tiers")&.each do |tier| %>
+                <div>
+                  <h4 class="font-semibold text-sm mb-2"><%= tier["name"] %></h4>
+                  <% tier["sponsors"]&.each do |sponsor| %>
+                    <div class="text-xs mb-1"><%= sponsor["name"] %></div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-500 mb-4">No sponsors data yet.</p>
+            <%= form_with url: fetch_studio_sponsors_path, method: :post, remote: true, class: "space-y-4" do |f| %>
+              <%= f.hidden_field :event_id, value: @event_slug %>
+              <div>
+                <%= f.label :base_url, "Event Website URL", class: "label" %>
+                <%= f.text_field :base_url, value: @event["website_url"] || @event["website"], class: "input input-bordered w-full",
+                      placeholder: "https://rubyconf.com" %>
+              </div>
+              <%= f.submit "Fetch Sponsors", class: "btn btn-primary" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card bg-base-100 border mb-6">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Event Details</h2>
+          <dl class="space-y-2">
+            <div>
+              <dt class="text-sm font-semibold text-gray-600">Organization</dt>
+              <% org = Studio::YAMLService.read_organizations.find { |o| o["slug"] == @organization_slug } %>
+              <dd><%= org&.dig("name") || @organization_slug %></dd>
+            </div>
+            <div>
+              <dt class="text-sm font-semibold text-gray-600">Slug</dt>
+              <dd><code><%= @event_slug %></code></dd>
+            </div>
+            <% if @event["location"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Location</dt>
+                <dd><%= @event["location"] %></dd>
+              </div>
+            <% end %>
+            <% if (@event["website_url"] || @event["website"]).present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Website</dt>
+                <dd>
+                  <% website = @event["website_url"] || @event["website"] %>
+                  <%= link_to website, website, target: "_blank", class: "link link-primary text-sm" %>
+                </dd>
+              </div>
+            <% end %>
+            <% if @event["cfp_link"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">CFP</dt>
+                <dd>
+                  <%= link_to "Call for Papers", @event["cfp_link"], target: "_blank", class: "link link-primary text-sm" %>
+                </dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <h2 class="card-title mb-4">File Structure</h2>
+          <div class="text-sm font-mono space-y-1">
+            <div>data/</div>
+            <div class="pl-4"><%= @organization_slug %>/</div>
+            <div class="pl-8"><%= @event_slug %>/</div>
+            <div class="pl-12">videos.yml</div>
+            <div class="pl-12">sponsors.yml</div>
+            <div class="pl-12">schedule.yml</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

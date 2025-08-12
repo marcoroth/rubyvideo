@@ -4,6 +4,7 @@ require "capybara"
 require "capybara/cuprite"
 
 class DownloadSponsors
+  include UrlNormalizable
   def initialize
     Capybara.register_driver(:cuprite_scraper) do |app|
       Capybara::Cuprite::Driver.new(app, window_size: [1200, 800], timeout: 20)
@@ -68,9 +69,9 @@ class DownloadSponsors
     sponsor_schema = {
       type: "object",
       properties: {
-        name: {type: "string", description: "Name of the sponsor"},
+        name: {type: "string", description: "Name of the sponsor/partner"},
         badge: {type: "string", description: "Extra badge/tag when this sponsor sponored something besides the tier. Usually something like 'Drinkup Sponsor', 'Climbing Sponsor', 'Hack Space Sponsor', 'Nursery Sponsor', 'Scheduler and Drinkup Sponsor', 'Design Sponsor', 'Party Sponsor', 'Lightning Talks Sponsor' or similar. Leave empty if none applies."},
-        website: {type: "string", description: "URL for the sponsor"},
+        website: {type: "string", description: "URL for the sponsor, remove all params or hash fragments, just keep the schema, host, and path."},
         slug: {type: "string", description: "name without spaces, url-safe, all-lowercase, dasherized"},
         logo_url: {type: "string", description: url ? "Full URL path for logo, if it is a relative path include the #{URI(url).origin} as the host, else keep the original URL" : "Full URL path for logo"}
       },
@@ -98,6 +99,17 @@ class DownloadSponsors
     }
 
     result = ActiveGenie::DataExtractor.call(html_content, schema)
+
+    if result&.dig("tiers")
+      result["tiers"].each do |tier|
+        tier["sponsors"]&.each do |sponsor|
+          if sponsor["website"].present?
+            sponsor["website"] = UrlNormalizable.normalize_url_string(sponsor["website"])
+          end
+        end
+      end
+    end
+
     File.write(save_file, [result.stringify_keys].to_yaml)
   end
 end

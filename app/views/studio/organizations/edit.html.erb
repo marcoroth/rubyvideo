@@ -1,0 +1,84 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <h1 class="text-3xl font-bold mb-8">Edit Organization: <%= @organization["name"] %></h1>
+
+  <div class="card bg-base-100 border">
+    <div class="card-body">
+      <%= form_with url: studio_organization_path(id: @organization["slug"]), method: :patch, local: true do |form| %>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="form-control md:col-span-2">
+            <%= form.label :name, class: "label" %>
+            <%= form.text_field :name, value: @organization["name"], class: "input input-bordered w-full", required: true %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :slug, class: "label" %>
+            <%= form.hidden_field :previous_slug, value: @organization["slug"] %>
+            <%= form.text_field :slug, value: @organization["slug"], class: "input input-bordered w-full", required: true %>
+            <label class="label">
+              <span class="label-text-alt">Used for URLs and file paths. Will rename folder if changed.</span>
+            </label>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :kind, class: "label" %>
+            <%= form.select :kind,
+                  [["Conference", "conference"], ["Meetup", "meetup"]],
+                  {selected: @organization["kind"]},
+                  class: "select select-bordered w-full", required: true %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :frequency, class: "label" %>
+            <%= form.select :frequency,
+                  [["Annual", "annual"], ["Monthly", "monthly"], ["Weekly", "weekly"], ["One-time", "one_time"]],
+                  {include_blank: "Select frequency", selected: @organization["frequency"]},
+                  class: "select select-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= label_tag :language, "Language", class: "label" %>
+            <%= select_tag :language,
+                  options_for_select([["English", "english"], ["Spanish", "spanish"], ["French", "french"], ["German", "german"], ["Japanese", "japanese"], ["Portuguese", "portuguese"], ["Russian", "russian"], ["Chinese", "chinese"]], @organization["language"] || "english"),
+                  class: "select select-bordered w-full" %>
+          </div>
+
+          <div class="form-control md:col-span-2">
+            <%= form.label :website, class: "label" %>
+            <%= form.text_field :website, value: @organization["website"], class: "input input-bordered w-full", placeholder: "https://rubyconf.com" %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :twitter, class: "label" %>
+            <%= form.text_field :twitter, value: @organization["twitter"], class: "input input-bordered w-full", placeholder: "@rubyconf" %>
+          </div>
+
+          <div class="form-control">
+            <%= label_tag :meetup_id, "Meetup ID", class: "label" %>
+            <%= text_field_tag :meetup_id, @organization["meetup_id"], class: "input input-bordered w-full", placeholder: "12345" %>
+            <label class="label">
+              <span class="label-text-alt">For meetup.com integration</span>
+            </label>
+          </div>
+
+          <div class="divider md:col-span-2">YouTube Integration (optional)</div>
+
+          <div class="form-control">
+            <%= label_tag :youtube_channel_name, "YouTube Channel Name", class: "label" %>
+            <%= text_field_tag :youtube_channel_name, @organization["youtube_channel_name"], class: "input input-bordered w-full", placeholder: "RubyConf" %>
+          </div>
+
+          <div class="form-control">
+            <%= label_tag :youtube_channel_id, "YouTube Channel ID", class: "label" %>
+            <%= text_field_tag :youtube_channel_id, @organization["youtube_channel_id"], class: "input input-bordered w-full", placeholder: "UCWnPjmqvljcafA0z2U1fwKQ" %>
+          </div>
+        </div>
+
+        <div class="form-control mt-6">
+          <%= form.submit "Update Organization", class: "btn btn-primary" %>
+          <%= link_to "Cancel", studio_organization_path(id: @organization["slug"]), class: "btn btn-outline ml-2" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

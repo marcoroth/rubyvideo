@@ -1,0 +1,97 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold mb-2">RubyEvents Studio</h1>
+    <p class="text-gray-600">Manage conference data and YAML files</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card bg-base-100 border">
+      <div class="card-body">
+        <h2 class="card-title">Organizations</h2>
+        <p class="text-3xl font-bold"><%= @organizations.count %></p>
+        <div class="card-actions justify-end">
+          <%= link_to "Manage", studio_organizations_path, class: "btn btn-primary btn-sm" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 border">
+      <div class="card-body">
+        <h2 class="card-title">Events</h2>
+        <p class="text-3xl font-bold"><%= @total_events %></p>
+        <div class="card-actions justify-end">
+          <%= link_to "Manage", studio_events_path, class: "btn btn-primary btn-sm" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 border">
+      <div class="card-body">
+        <h2 class="card-title">Talks</h2>
+        <p class="text-3xl font-bold"><%= @total_talks %></p>
+        <div class="card-actions justify-end">
+          <%= link_to "View", talks_path, class: "btn btn-primary btn-sm" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div>
+      <h2 class="text-2xl font-bold mb-4">Quick Actions</h2>
+      <div class="space-y-4">
+        <%= link_to studio_organizations_path, class: "block" do %>
+          <div class="card bg-base-100 border hover:border  transition-shadow">
+            <div class="card-body">
+              <h3 class="font-semibold">Create New Organization</h3>
+              <p class="text-sm text-gray-600">Add a new conference or meetup organization</p>
+            </div>
+          </div>
+        <% end %>
+
+        <%= link_to studio_events_path, class: "block" do %>
+          <div class="card bg-base-100 border hover:border  transition-shadow">
+            <div class="card-body">
+              <h3 class="font-semibold">Create New Event</h3>
+              <p class="text-sm text-gray-600">Add a new conference or meetup event</p>
+            </div>
+          </div>
+        <% end %>
+
+        <%= link_to studio_sponsors_path, class: "block" do %>
+          <div class="card bg-base-100 border hover:border  transition-shadow">
+            <div class="card-body">
+              <h3 class="font-semibold">Download Sponsors</h3>
+              <p class="text-sm text-gray-600">Fetch sponsor data from conference websites</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-bold mb-4">Recent Events</h2>
+      <div class="space-y-2">
+        <% @recent_events.each do |event| %>
+          <div class="card bg-base-100 border">
+            <div class="card-body p-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3 class="font-semibold"><%= event.name %></h3>
+                  <p class="text-sm text-gray-600">
+                    <%= event.organisation.name %> •
+                    <%= event.date&.strftime("%B %Y") %>
+                  </p>
+                </div>
+                <div class="flex gap-2">
+                  <%= link_to "Edit", edit_studio_event_path(event), class: "btn btn-xs" %>
+                  <%= link_to "Videos", studio_event_videos_path(event), class: "btn btn-xs btn-primary" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

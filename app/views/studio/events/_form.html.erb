@@ -1,0 +1,198 @@
+<%
+  # Determine if this is an edit or create form
+  is_edit = event.is_a?(Hash) && event["slug"].present?
+  form_url = is_edit ? studio_event_path(event["slug"]) : studio_events_path
+  form_method = is_edit ? :patch : :post
+%>
+<%= form_with url: form_url, method: form_method, local: true do |form| %>
+  <% if is_edit %>
+    <%= form.hidden_field :previous_slug, value: event["slug"] %>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <%= form.label :name, class: "label" %>
+      <%= form.text_field :name,
+            value: event.is_a?(Hash) ? (event["title"] || event["name"]) : event.name,
+            class: "input input-bordered w-full", required: true %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :slug, class: "label" %>
+      <%= form.text_field :slug,
+            value: event.is_a?(Hash) ? event["slug"] : event.slug,
+            class: "input input-bordered w-full", required: true %>
+      <label class="label">
+        <span class="label-text-alt">Used for URLs and file paths. Will rename folder if changed.</span>
+      </label>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :date, "Start Date", class: "label" %>
+      <%= form.date_field :date,
+            value: event.is_a?(Hash) ? event["start_date"] : event.start_date,
+            class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :end_date, "End Date", class: "label" %>
+      <%= form.date_field :end_date,
+            value: event.is_a?(Hash) ? event["end_date"] : event.end_date,
+            class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :organisation_slug, "Organization", class: "label" %>
+      <% organizations = defined?(@organizations) ? @organizations : Studio::YAMLService.read_organizations %>
+      <% 
+        current_org = if event.is_a?(Hash) && defined?(@organization_slug) && @organization_slug
+                        @organization_slug
+                      elsif event.is_a?(Hash) && event["organisation_slug"]
+                        event["organisation_slug"]
+                      elsif defined?(@preselected_organization) && @preselected_organization
+                        @preselected_organization
+                      elsif !event.is_a?(Hash) && event.organisation_id
+                        event.organisation_id
+                      else
+                        nil
+                      end
+      %>
+      <%= form.select :organisation_slug,
+            options_for_select(organizations.map { |o| [o["name"], o["slug"]] }, current_org),
+            {prompt: "Select organization"},
+            class: "select select-bordered w-full", required: true %>
+    </div>
+
+    <div class="form-control md:col-span-2">
+      <%= form.label :location, class: "label" %>
+      <%= form.text_field :location,
+            value: event.is_a?(Hash) ? event["location"] : event.location,
+            class: "input input-bordered w-full", placeholder: "Chicago, IL" %>
+    </div>
+
+    <div class="form-control md:col-span-2">
+      <%= form.label :website, class: "label" %>
+      <%= form.text_field :website,
+            value: event.is_a?(Hash) ? (event["website_url"] || event["website"]) : event.website,
+            class: "input input-bordered w-full", placeholder: "https://rubyconf.com" %>
+    </div>
+
+    <div class="form-control md:col-span-2">
+      <%= form.label :description, "Description (optional)", class: "label" %>
+      <%= form.text_area :description,
+            value: event.is_a?(Hash) ? event["description"] : event.description,
+            class: "textarea textarea-bordered w-full", rows: 3,
+            placeholder: "A brief description of the event..." %>
+    </div>
+
+    <div class="divider md:col-span-2">Call for Papers (optional)</div>
+
+    <div class="form-control md:col-span-2">
+      <%= form.label :cfp_link, "CFP Link", class: "label" %>
+      <%= form.text_field :cfp_link,
+            value: event.is_a?(Hash) ? event["cfp_link"] : event.cfp_link,
+            class: "input input-bordered w-full", placeholder: "https://cfp.rubyconf.com" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :cfp_open_date, "CFP Opens", class: "label" %>
+      <%= form.date_field :cfp_open_date,
+            value: event.is_a?(Hash) ? event["cfp_open_date"] : event.cfp_open_date,
+            class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :cfp_close_date, "CFP Closes", class: "label" %>
+      <%= form.date_field :cfp_close_date,
+            value: event.is_a?(Hash) ? event["cfp_close_date"] : event.cfp_close_date,
+            class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="divider md:col-span-2">Event Styling (optional)</div>
+
+    <div class="form-control">
+      <%= form.label :banner_background, "Banner Background", class: "label" %>
+      <div class="flex gap-2" data-controller="color-sync">
+        <%= form.color_field :banner_background,
+              value: (event.is_a?(Hash) ? event["banner_background"] : event.banner_background) || "#BF281C",
+              class: "w-16 h-12 rounded border border-base-300",
+              data: { 
+                "color-sync-target": "colorPicker",
+                action: "change->color-sync#syncFromColor"
+              } %>
+        <%= form.text_field :banner_background,
+              value: event.is_a?(Hash) ? event["banner_background"] : event.banner_background,
+              class: "input input-bordered flex-1", placeholder: "#BF281C or linear-gradient(...)",
+              data: { 
+                "color-sync-target": "textField",
+                action: "input->color-sync#syncFromText"
+              } %>
+      </div>
+      <label class="label">
+        <span class="label-text-alt">CSS color or gradient for event banner</span>
+      </label>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :featured_background, "Featured Background", class: "label" %>
+      <div class="flex gap-2" data-controller="color-sync">
+        <%= form.color_field :featured_background,
+              value: (event.is_a?(Hash) ? event["featured_background"] : event.featured_background) || "#BF281C",
+              class: "w-16 h-12 rounded border border-base-300",
+              data: { 
+                "color-sync-target": "colorPicker",
+                action: "change->color-sync#syncFromColor"
+              } %>
+        <%= form.text_field :featured_background,
+              value: event.is_a?(Hash) ? event["featured_background"] : event.featured_background,
+              class: "input input-bordered flex-1", placeholder: "#BF281C",
+              data: { 
+                "color-sync-target": "textField",
+                action: "input->color-sync#syncFromText"
+              } %>
+      </div>
+      <label class="label">
+        <span class="label-text-alt">Background color for featured content</span>
+      </label>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :featured_color, "Featured Text Color", class: "label" %>
+      <div class="flex gap-2" data-controller="color-sync">
+        <%= form.color_field :featured_color,
+              value: (event.is_a?(Hash) ? event["featured_color"] : event.featured_color) || "#FFFFFF",
+              class: "w-16 h-12 rounded border border-base-300",
+              data: { 
+                "color-sync-target": "colorPicker",
+                action: "change->color-sync#syncFromColor"
+              } %>
+        <%= form.text_field :featured_color,
+              value: event.is_a?(Hash) ? event["featured_color"] : event.featured_color,
+              class: "input input-bordered flex-1", placeholder: "#FFFFFF",
+              data: { 
+                "color-sync-target": "textField",
+                action: "input->color-sync#syncFromText"
+              } %>
+      </div>
+      <label class="label">
+        <span class="label-text-alt">Text color for featured content</span>
+      </label>
+    </div>
+
+    <% if defined?(playlist_id) %>
+      <div class="form-control">
+        <%= label_tag :playlist_id, "YouTube Playlist ID", class: "label" %>
+        <%= text_field_tag :playlist_id, playlist_id, class: "input input-bordered w-full",
+              placeholder: "PLbHJudTY1K0chrs_E_XFz3QdG8LCRs3LS" %>
+        <label class="label">
+          <span class="label-text-alt">Optional: YouTube playlist ID to fetch videos from</span>
+        </label>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="form-control mt-6">
+    <%= form.submit is_edit ? "Update Event" : "Create Event", class: "btn btn-primary" %>
+    <%= link_to "Cancel", is_edit ? studio_event_path(event["slug"]) : studio_events_path, class: "btn btn-outline ml-2" %>
+  </div>
+<% end %>

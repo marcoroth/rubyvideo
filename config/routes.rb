@@ -33,6 +33,24 @@ Rails.application.routes.draw do
     mount Avo::Engine, at: Avo.configuration.root_path
   end
 
+  if Rails.env.development?
+    namespace :studio do
+      root to: "dashboard#index"
+      resources :events do
+        resources :videos
+        member do
+          post :fetch_videos
+        end
+      end
+      resources :organizations
+      resources :sponsors, only: [:index, :create] do
+        collection do
+          post :fetch
+        end
+      end
+    end
+  end
+
   resources :topics, param: :slug, only: [:index, :show]
   resources :cfp, only: :index
   resources :sessions, only: [:index, :show, :destroy]

@@ -1,0 +1,53 @@
+<div class="card-body">
+  <h3 class="card-title"><%= event.name %> Sponsors</h3>
+
+  <% if sponsors.present? && sponsors.first["tiers"].present? %>
+    <div class="space-y-6">
+      <% sponsors.first["tiers"].each do |tier| %>
+        <div>
+          <h4 class="font-semibold text-lg mb-3">
+            <%= tier["name"] %>
+            <span class="badge badge-outline ml-2">Level <%= tier["level"] %></span>
+          </h4>
+
+          <% if tier["description"].present? %>
+            <p class="text-sm text-gray-600 mb-3"><%= tier["description"] %></p>
+          <% end %>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <% tier["sponsors"]&.each do |sponsor| %>
+              <div class="border rounded p-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h5 class="font-semibold"><%= sponsor["name"] %></h5>
+                    <% if sponsor["badge"].present? %>
+                      <span class="badge badge-sm badge-primary mt-1"><%= sponsor["badge"] %></span>
+                    <% end %>
+                    <% if sponsor["website"].present? %>
+                      <a href="<%= sponsor["website"] %>" target="_blank" class="text-xs link link-primary">
+                        <%= sponsor["website"].sub(/^https?:\/\//, "").sub(/\/$/, "") %>
+                      </a>
+                    <% end %>
+                  </div>
+                  <% if sponsor["logo_url"].present? %>
+                    <img src="<%= sponsor["logo_url"] %>" alt="<%= sponsor["name"] %>"
+                         class="w-16 h-16 object-contain" loading="lazy">
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%= form_with url: studio_sponsors_path, local: true, class: "mt-6" do |f| %>
+      <%= f.hidden_field :event_id, value: event.id %>
+      <%= f.hidden_field :temp_file, value: local_assigns[:temp_file] %>
+      <%= f.submit "Save Sponsors to YAML", class: "btn btn-primary" %>
+      <p class="text-xs text-gray-500 mt-2">This will move the previewed data to the final sponsors.yml file.</p>
+    <% end %>
+  <% else %>
+    <p class="text-gray-500">No sponsors found or invalid format.</p>
+  <% end %>
+</div>

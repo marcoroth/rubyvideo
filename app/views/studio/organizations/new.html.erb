@@ -1,0 +1,92 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <h1 class="text-3xl font-bold mb-8">New Organization</h1>
+
+  <div class="card bg-base-100 border">
+    <div class="card-body">
+      <%= form_with model: @organization, url: studio_organizations_path, local: true do |form| %>
+        <% if @organization.errors.any? %>
+          <div class="alert alert-error mb-4">
+            <ul>
+              <% @organization.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="form-control md:col-span-2">
+            <%= form.label :name, class: "label" %>
+            <%= form.text_field :name, class: "input input-bordered w-full", required: true %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :slug, class: "label" %>
+            <%= form.text_field :slug, class: "input input-bordered w-full", required: true %>
+            <label class="label">
+              <span class="label-text-alt">Used for URLs and file paths</span>
+            </label>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :kind, class: "label" %>
+            <%= form.select :kind,
+                  [["Conference", "conference"], ["Meetup", "meetup"]],
+                  {prompt: "Select type"},
+                  class: "select select-bordered w-full", required: true %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :frequency, class: "label" %>
+            <%= form.select :frequency,
+                  [["Annual", "annual"], ["Monthly", "monthly"], ["Weekly", "weekly"], ["One-time", "one_time"]],
+                  {prompt: "Select frequency"},
+                  class: "select select-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= label_tag :language, "Language", class: "label" %>
+            <%= select_tag :language,
+                  options_for_select([["English", "english"], ["Spanish", "spanish"], ["French", "french"], ["German", "german"], ["Japanese", "japanese"], ["Portuguese", "portuguese"], ["Russian", "russian"], ["Chinese", "chinese"]], "english"),
+                  class: "select select-bordered w-full" %>
+          </div>
+
+          <div class="form-control md:col-span-2">
+            <%= form.label :website, class: "label" %>
+            <%= form.text_field :website, class: "input input-bordered w-full", placeholder: "https://rubyconf.com" %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :twitter, class: "label" %>
+            <%= form.text_field :twitter, class: "input input-bordered w-full", placeholder: "@rubyconf" %>
+          </div>
+
+          <div class="form-control">
+            <%= label_tag :meetup_id, "Meetup ID", class: "label" %>
+            <%= text_field_tag :meetup_id, "", class: "input input-bordered w-full", placeholder: "12345" %>
+            <label class="label">
+              <span class="label-text-alt">For meetup.com integration</span>
+            </label>
+          </div>
+
+          <div class="divider md:col-span-2">YouTube Integration (optional)</div>
+
+          <div class="form-control">
+            <%= label_tag :youtube_channel_name, "YouTube Channel Name", class: "label" %>
+            <%= text_field_tag :youtube_channel_name, "", class: "input input-bordered w-full", placeholder: "RubyConf" %>
+          </div>
+
+          <div class="form-control">
+            <%= label_tag :youtube_channel_id, "YouTube Channel ID", class: "label" %>
+            <%= text_field_tag :youtube_channel_id, "", class: "input input-bordered w-full", placeholder: "UCWnPjmqvljcafA0z2U1fwKQ" %>
+          </div>
+        </div>
+
+        <div class="form-control mt-6">
+          <%= form.submit "Create Organization", class: "btn btn-primary" %>
+          <%= link_to "Cancel", studio_organizations_path, class: "btn btn-outline ml-2" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

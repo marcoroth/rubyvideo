@@ -13,6 +13,9 @@ application.register("auto-submit", AutoSubmitController)
 import Bridge__ButtonController from "./bridge/button_controller"
 application.register("bridge--button", Bridge__ButtonController)
 
+import ColorSyncController from "./color_sync_controller"
+application.register("color-sync", ColorSyncController)
+
 import CopyToClipboardController from "./copy_to_clipboard_controller"
 application.register("copy-to-clipboard", CopyToClipboardController)
 
@@ -46,6 +49,9 @@ application.register("scroll-into-view", ScrollIntoViewController)
 import SplideController from "./splide_controller"
 application.register("splide", SplideController)
 
+import SponsorPreviewController from "./sponsor_preview_controller"
+application.register("sponsor-preview", SponsorPreviewController)
+
 import SpotlightSearchController from "./spotlight_search_controller"
 application.register("spotlight-search", SpotlightSearchController)
 
@@ -69,3 +75,6 @@ application.register("transition", TransitionController)
 
 import VideoPlayerController from "./video_player_controller"
 application.register("video-player", VideoPlayerController)
+
+import VideoPreviewController from "./video_preview_controller"
+application.register("video-preview", VideoPreviewController)

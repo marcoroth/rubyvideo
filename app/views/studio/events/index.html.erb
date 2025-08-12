@@ -1,0 +1,78 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">
+      <% if @organization_name %>
+        Events for <%= @organization_name %>
+      <% else %>
+        All Events
+      <% end %>
+    </h1>
+    <% if @organization_slug %>
+      <%= link_to "New Event", new_studio_event_path(organization_id: @organization_slug), class: "btn btn-primary" %>
+    <% else %>
+      <%= link_to "New Event", new_studio_event_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @events.each do |event| %>
+      <% 
+        # Handle both Hash data and event slug strings
+        if event.is_a?(Hash)
+          event_slug = event["slug"]
+          event_title = event["title"] || event["name"]
+          event_org_slug = event["organisation_slug"]
+          event_org_name = event["organisation_name"]
+          event_date = event["date"] || event["published_at"]
+          event_end_date = event["end_date"]
+          event_location = event["location"]
+        else
+          # Just a slug string - need to load playlist data
+          playlists = Studio::YAMLService.read_playlists(@organization_slug)
+          playlist = playlists.find { |p| p["slug"] == event }
+          next unless playlist
+          
+          event_slug = event
+          event_title = playlist["title"]
+          event_org_slug = @organization_slug
+          event_org_name = @organization_name
+          event_date = playlist["published_at"] || playlist["date"]
+          event_end_date = playlist["end_date"]
+          event_location = playlist["location"]
+        end
+        
+        # Count videos for this event
+        videos_count = Studio::YAMLService.read_event_videos(event_org_slug, event_slug).count
+      %>
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <h2 class="card-title"><%= event_title %></h2>
+          <p class="text-sm text-gray-600">
+            <%= event_org_name %><br>
+            <% if event_date %>
+              <%= Date.parse(event_date.to_s).strftime("%B %d, %Y") %>
+              <% if event_end_date && event_end_date != event_date %>
+                - <%= Date.parse(event_end_date.to_s).strftime("%B %d, %Y") %>
+              <% end %>
+            <% end %>
+          </p>
+
+          <div class="flex gap-2 mt-2">
+            <% if event_location.present? %>
+              <span class="badge badge-outline"><%= event_location %></span>
+            <% end %>
+            <% if videos_count > 0 %>
+              <span class="badge badge-primary"><%= videos_count %> videos</span>
+            <% end %>
+          </div>
+
+          <div class="card-actions justify-end mt-4">
+            <%= link_to "View", studio_event_path(id: event_slug, organization_id: event_org_slug), class: "btn btn-sm" %>
+            <%= link_to "Videos", studio_event_videos_path(event_id: event_slug), class: "btn btn-sm btn-primary" %>
+            <%= link_to "Edit", edit_studio_event_path(id: event_slug, organization_id: event_org_slug), class: "btn btn-sm" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

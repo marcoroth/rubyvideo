@@ -1,0 +1,53 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Organizations</h1>
+    <%= link_to "New Organization", new_studio_organization_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Kind</th>
+          <th>Events</th>
+          <th>Source</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @organizations.each do |org| %>
+          <tr>
+            <td>
+              <div class="font-semibold"><%= org["name"] %></div>
+              <% if org["website"].present? %>
+                <div class="text-sm text-gray-600"><%= org["website"] %></div>
+              <% end %>
+            </td>
+            <td><%= org["slug"] %></td>
+            <td>
+              <span class="badge <%= (org["kind"] == "conference") ? "badge-primary" : "badge-secondary" %>">
+                <%= org["kind"] %>
+              </span>
+            </td>
+            <td>
+              <% event_count = Studio::YAMLService.list_organization_events(org["slug"]).count %>
+              <%= event_count %>
+            </td>
+            <td>
+              <span class="badge badge-success">✓ YAML</span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <%= link_to "View", studio_organization_path(id: org["slug"]), class: "btn btn-xs" %>
+                <%= link_to "Edit", edit_studio_organization_path(id: org["slug"]), class: "btn btn-xs" %>
+                <%= link_to "Events", studio_events_path(organization_id: org["slug"]), class: "btn btn-xs btn-primary" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

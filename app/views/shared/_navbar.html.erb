@@ -8,6 +8,9 @@
         <%= render "shared/navbar/link", link_title: "Sponsors", path: sponsors_path %>
         <%= render "shared/navbar/link", link_title: "Topics", path: topics_path %>
         <%= render "shared/navbar/link", link_title: "CFP", path: cfp_index_path %>
+        <% if Rails.env.development? %>
+          <%= render "shared/navbar/link", link_title: "Studio", path: studio_root_path %>
+        <% end %>
       </ul>
     </div>
 

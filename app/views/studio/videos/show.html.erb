@@ -1,0 +1,162 @@
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold"><%= @video["title"] %></h1>
+      <p class="text-gray-600"><%= @event.name %> • <%= @event.organisation.name %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "Edit", edit_studio_event_video_path(@event, params[:id]), class: "btn btn-primary" %>
+      <%= link_to "Back to Videos", studio_event_videos_path(@event), class: "btn btn-outline" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <% if @youtube_embed_url %>
+        <div class="card bg-base-100 border mb-6">
+          <div class="card-body">
+            <h2 class="card-title mb-4">Video Preview</h2>
+            <div class="aspect-w-16 aspect-h-9">
+              <iframe
+                src="<%= @youtube_embed_url %>"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                class="w-full h-96">
+              </iframe>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @video["description"].present? %>
+        <div class="card bg-base-100 border">
+          <div class="card-body">
+            <h2 class="card-title mb-4">Description</h2>
+            <p class="whitespace-pre-wrap"><%= @video["description"] %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div>
+      <div class="card bg-base-100 border mb-6">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Video Details</h2>
+          <dl class="space-y-3">
+            <% if @video["speakers"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Speakers</dt>
+                <dd>
+                  <% Array(@video["speakers"]).each do |speaker| %>
+                    <span class="badge badge-primary mr-1"><%= speaker %></span>
+                  <% end %>
+                </dd>
+              </div>
+            <% end %>
+
+            <% if @video["date"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Date</dt>
+                <dd><%= @video["date"] %></dd>
+              </div>
+            <% end %>
+
+            <% if @video["published_at"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Published</dt>
+                <dd><%= @video["published_at"] %></dd>
+              </div>
+            <% end %>
+
+            <% if @video["language"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Language</dt>
+                <dd><%= @video["language"].capitalize %></dd>
+              </div>
+            <% end %>
+
+            <% if @video["track"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Track</dt>
+                <dd><%= @video["track"] %></dd>
+              </div>
+            <% end %>
+
+            <% if @video["video_provider"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Provider</dt>
+                <dd><span class="badge"><%= @video["video_provider"] %></span></dd>
+              </div>
+            <% end %>
+
+            <% if @video["video_id"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Video ID</dt>
+                <dd><code><%= @video["video_id"] %></code></dd>
+              </div>
+            <% end %>
+
+            <% if @video["slides_url"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Slides</dt>
+                <dd>
+                  <%= link_to "View Slides", @video["slides_url"], target: "_blank",
+                        class: "link link-primary" %>
+                </dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+
+      <% if @video["start_cue"].present? || @video["end_cue"].present? || @video["thumbnail_cue"].present? %>
+        <div class="card bg-base-100 border mb-6">
+          <div class="card-body">
+            <h2 class="card-title mb-4">Cue Points</h2>
+            <dl class="space-y-2">
+              <% if @video["start_cue"].present? %>
+                <div>
+                  <dt class="text-sm font-semibold text-gray-600">Start</dt>
+                  <dd><code><%= @video["start_cue"] %></code></dd>
+                </div>
+              <% end %>
+              <% if @video["end_cue"].present? %>
+                <div>
+                  <dt class="text-sm font-semibold text-gray-600">End</dt>
+                  <dd><code><%= @video["end_cue"] %></code></dd>
+                </div>
+              <% end %>
+              <% if @video["thumbnail_cue"].present? %>
+                <div>
+                  <dt class="text-sm font-semibold text-gray-600">Thumbnail</dt>
+                  <dd><code><%= @video["thumbnail_cue"] %></code></dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+        </div>
+      <% end %>
+
+      <% thumbnails = [@video["thumbnail_xs"], @video["thumbnail_sm"], @video["thumbnail_md"], @video["thumbnail_lg"], @video["thumbnail_xl"]].compact %>
+      <% if thumbnails.any? %>
+        <div class="card bg-base-100 border">
+          <div class="card-body">
+            <h2 class="card-title mb-4">Thumbnails</h2>
+            <div class="space-y-2">
+              <% %w[thumbnail_xs thumbnail_sm thumbnail_md thumbnail_lg thumbnail_xl].each do |size| %>
+                <% if @video[size].present? %>
+                  <div>
+                    <p class="text-sm font-semibold"><%= size.humanize %></p>
+                    <img src="<%= @video[size] %>" alt="<%= @video["title"] %>"
+                         class="w-full max-w-xs rounded border" loading="lazy">
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

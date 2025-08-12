@@ -1,0 +1,146 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-3xl font-bold mb-2"><%= @organization["name"] %></h1>
+        <p class="text-gray-600">
+          <span class="badge <%= (@organization["kind"] == "conference") ? "badge-primary" : "badge-secondary" %>">
+            <%= @organization["kind"]&.capitalize %>
+          </span>
+          <% if @organization["frequency"].present? %>
+            • <%= @organization["frequency"].humanize %>
+          <% end %>
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <%= link_to "Edit Organization", edit_studio_organization_path(id: @organization["slug"]), class: "btn btn-primary" %>
+        <%= link_to "New Event", new_studio_event_path(organization_id: @organization["slug"]), class: "btn btn-outline" %>
+        <%= link_to "Back to Organizations", studio_organizations_path, class: "btn btn-outline" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <div class="card bg-base-100 border mb-6">
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">Events (<%= @events.count %>)</h2>
+            <%= link_to "Manage All Events", studio_events_path(organization_id: @organization["slug"]), class: "btn btn-sm btn-primary" %>
+          </div>
+
+          <% if @events.any? %>
+            <div class="space-y-2">
+              <% @events.first(5).each do |event_slug| %>
+                <div class="border rounded p-3">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <h3 class="font-semibold"><%= event_slug.humanize %></h3>
+                      <p class="text-sm text-gray-600">
+                        Event directory: <code><%= event_slug %></code>
+                      </p>
+                    </div>
+                    <div class="flex gap-1">
+                      <%= link_to "Edit", edit_studio_event_path(id: "#{@organization["slug"]}-#{event_slug}"), class: "btn btn-xs" %>
+                      <%= link_to "Videos", studio_event_videos_path(event_id: "#{@organization["slug"]}-#{event_slug}"), class: "btn btn-xs btn-primary" %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+              <% if @events.count > 5 %>
+                <p class="text-sm text-gray-600 text-center pt-2">
+                  ... and <%= @events.count - 5 %> more events
+                </p>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-500">No events created yet.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @playlists.any? %>
+        <div class="card bg-base-100 border">
+          <div class="card-body">
+            <h2 class="card-title mb-4">YouTube Playlists (<%= @playlists.count %>)</h2>
+            <div class="space-y-2">
+              <% @playlists.first(5).each do |playlist| %>
+                <div class="border rounded p-2">
+                  <h4 class="font-semibold text-sm"><%= playlist.title %></h4>
+                  <p class="text-xs text-gray-600">
+                    Slug: <code><%= playlist.slug %></code>
+                    <% if playlist.id %>
+                      • Playlist ID: <code><%= playlist.id %></code>
+                    <% end %>
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div>
+      <div class="card bg-base-100 border mb-6">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Organization Details</h2>
+          <dl class="space-y-2">
+            <div>
+              <dt class="text-sm font-semibold text-gray-600">Slug</dt>
+              <dd><code><%= @organization["slug"] %></code></dd>
+            </div>
+            <% if @organization["website"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Website</dt>
+                <dd>
+                  <%= link_to @organization["website"], @organization["website"], target: "_blank", class: "link link-primary text-sm" %>
+                </dd>
+              </div>
+            <% end %>
+            <% if @organization["twitter"].present? %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Twitter</dt>
+                <dd><%= @organization["twitter"] %></dd>
+              </div>
+            <% end %>
+            <% if @organization["language"] %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Language</dt>
+                <dd><%= @organization["language"].capitalize %></dd>
+              </div>
+            <% end %>
+            <% if @organization["youtube_channel_name"] %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">YouTube Channel</dt>
+                <dd><%= @organization["youtube_channel_name"] %></dd>
+              </div>
+            <% end %>
+            <% if @organization["meetup_id"] %>
+              <div>
+                <dt class="text-sm font-semibold text-gray-600">Meetup ID</dt>
+                <dd><%= @organization["meetup_id"] %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <h2 class="card-title mb-4">File Structure</h2>
+          <div class="text-sm font-mono space-y-1">
+            <div>data/</div>
+            <div class="pl-4">organisations.yml</div>
+            <div class="pl-4"><%= @organization["slug"] %>/</div>
+            <div class="pl-8">playlists.yml</div>
+            <% @events.first(3).each do |event_slug| %>
+              <div class="pl-8"><%= event_slug %>/</div>
+              <div class="pl-12">videos.yml</div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

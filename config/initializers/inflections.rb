@@ -18,4 +18,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "LLM"
   inflect.acronym "SQLite"
   inflect.acronym "YouTube"
+  inflect.acronym "YAML"
 end
