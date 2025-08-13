@@ -37,6 +37,13 @@ class SpeakersController < ApplicationController
       [country, @events.select { |e| e.static_metadata&.country == country }] if country
     }.compact.uniq(&:first).sort_by { |country, _| country.translations["en"] }
 
+    # Get stamps for countries where speaker has events
+    @speaker_stamps = @countries_with_events.map { |country, events|
+      # Try to find a stamp for this country
+      stamp = Stamp.all.find { |s| s.country == country }
+      [stamp, events] if stamp
+    }.compact
+
     @back_path = speakers_path
 
     set_meta_tags(@speaker)

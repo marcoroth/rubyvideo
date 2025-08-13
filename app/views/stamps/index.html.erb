@@ -15,6 +15,56 @@
     position: relative;
     filter: brightness(0) saturate(100%) sepia(1) hue-rotate(220deg) saturate(2) opacity(0.8);
   }
+  
+  /* Stamp texture overlay using SVG noise */
+  .passport-stamp::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('stamps/noise.svg');
+    background-size: 120px 120px;
+    background-repeat: repeat;
+    background-position: 0 0;
+    opacity: 0.3;
+    pointer-events: none;
+    border-radius: 0.75rem;
+    mix-blend-mode: screen;
+    z-index: 1;
+  }
+  
+  /* Variation in stamp texture positioning and opacity */
+  .passport-stamp-card:nth-child(3n) .passport-stamp::after {
+    opacity: 0.4;
+    background-position: 25% 75%;
+  }
+  
+  .passport-stamp-card:nth-child(5n) .passport-stamp::after {
+    opacity: 0.2;
+    background-position: 75% 25%;
+  }
+  
+  .passport-stamp-card:nth-child(7n) .passport-stamp::after {
+    opacity: 0.35;
+    background-position: 50% 10%;
+  }
+  
+  .passport-stamp-card:nth-child(4n) .passport-stamp::after {
+    background-position: 10% 50%;
+    opacity: 0.25;
+  }
+  
+  .passport-stamp-card:nth-child(6n) .passport-stamp::after {
+    background-position: 90% 80%;
+    opacity: 0.3;
+  }
+  
+  .passport-stamp-card:nth-child(8n) .passport-stamp::after {
+    background-position: 30% 30%;
+    opacity: 0.4;
+  }
 
   .passport-stamp-card:nth-child(even) .passport-stamp {
     transform: rotate(2deg) scale(1.02) scaleY(0.96);
@@ -55,6 +105,10 @@
   .passport-stamp-card:hover .passport-stamp {
     filter: none;
     transform: rotate(0deg) scale(1) scaleX(1) scaleY(1) !important;
+  }
+  
+  .passport-stamp-card:hover .passport-stamp::after {
+    opacity: 0;
   }
 
 </style>

@@ -93,6 +93,14 @@
           <%= render partial: "shared/stickers_display", locals: {events: @events_with_stickers} %>
         </div>
       <% end %>
+
+      <% if @speaker_stamps.any? %>
+        <input type="radio" name="talk_tabs" role="tab" class="tab px-6" aria-label="Stamps (<%= @speaker_stamps.count %>)">
+
+        <div role="tabpanel" class="tab-content mt-6">
+          <%= render partial: "speakers/passport_stamps", locals: {speaker_stamps: @speaker_stamps, speaker: @speaker} %>
+        </div>
+      <% end %>
     <% end %>
   </div>
 </div>
